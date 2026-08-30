@@ -659,46 +659,93 @@ function активировать(ид, тянуть = true) {
       .join('');
   }
 
-  /* ── пиксельные люди: 4 персонажа за 4 столами, нарисовано сами, без внешних файлов ── */
+  /* ── пиксельные люди: 4 персонажа за 4 РАЗНЫМИ рабочими местами (не общий стол),
+     реальные спрайты Pixel Agents (CC0, 7 колонок × 3 ряда по 16×32) + реальный ПК ── */
   const канвас = document.getElementById('пиксель-канвас');
   const ctx = канвас.getContext('2d');
-  const ШИР = 160, ВЫС = 90;
+  const ШИР = 200, ВЫС = 96;
   канвас.width = ШИР; канвас.height = ВЫС;
   ctx.imageSmoothingEnabled = false;
 
-  const столы = ['#1f6feb', '#0e8a6d', '#c98a2c', '#a5586e'].map((цвет, i) => ({
-    x: 22 + i * 38, y: 58, цвет, шаг: i % 2 === 0 ? 1 : -1
-  }));
+  const РЯД = { вниз: 0, вверх: 1, бок: 2 };
+  const К = 16, В = 32; // размер кадра
+
+  function img(src) { const i = new Image(); i.src = src; return i; }
+  const ПК = [img('assets/pixel/PC_FRONT_ON_1.png'), img('assets/pixel/PC_FRONT_ON_2.png'), img('assets/pixel/PC_FRONT_ON_3.png')];
+
+  const ЛЮДИ = ['assets/pixel/char_0.png', 'assets/pixel/char_1.png', 'assets/pixel/char_2.png', 'assets/pixel/char_3.png']
+    .map((src, i) => ({
+      img: img(src), домX: 26 + i * 46, y: 74, facing: 'вниз',
+      x: 26 + i * 46, состояние: 'работа', пауза: 0,
+      цель: null, следующееБлуждание: 1500 + Math.random() * 3000
+    }));
   const искры = [];
 
-  function рисовать(t, celebrating) {
+  function обновитьБлуждание(л, dt) {
+    if (л.состояние === 'работа') {
+      л.следующееБлуждание -= dt;
+      if (л.следующееБлуждание <= 0) {
+        const dx = (Math.random() * 20 + 10) * (Math.random() < 0.5 ? -1 : 1);
+        л.цель = Math.max(10, Math.min(ШИР - 10, л.домX + dx));
+        л.facing = dx < 0 ? 'влево' : 'вправо';
+        л.состояние = 'идёт-туда';
+      }
+    } else if (л.состояние === 'идёт-туда') {
+      const dx = л.цель - л.x;
+      if (Math.abs(dx) < 1) { л.состояние = 'пауза'; л.пауза = 400 + Math.random() * 700; }
+      else л.x += Math.sign(dx) * Math.min(Math.abs(dx), dt * 0.045);
+    } else if (л.состояние === 'пауза') {
+      л.пауза -= dt;
+      if (л.пауза <= 0) { л.цель = л.домX; л.facing = л.x > л.домX ? 'влево' : 'вправо'; л.состояние = 'идёт-домой'; }
+    } else if (л.состояние === 'идёт-домой') {
+      const dx = л.цель - л.x;
+      if (Math.abs(dx) < 1) {
+        л.x = л.домX; л.facing = 'вниз'; л.состояние = 'работа';
+        л.следующееБлуждание = 2500 + Math.random() * 4500;
+      } else л.x += Math.sign(dx) * Math.min(Math.abs(dx), dt * 0.045);
+    }
+  }
+
+  function мод(n, m) { return ((n % m) + m) % m; }
+
+  function рисовать(t, celebrating, dt) {
+    t = Math.max(0, t);
     ctx.clearRect(0, 0, ШИР, ВЫС);
     ctx.fillStyle = '#eef0f2'; ctx.fillRect(0, 0, ШИР, ВЫС);
     ctx.fillStyle = '#d8dbdf';
-    for (let x = 0; x < ШИР; x += 20) ctx.fillRect(x, 66, 1, ВЫС - 66);
+    for (let x = 0; x < ШИР; x += 22) ctx.fillRect(x, 70, 1, ВЫС - 70);
 
-    столы.forEach((с, i) => {
-      const фаза = t / 260 + i * 1.7;
-      const прыжок = celebrating ? Math.abs(Math.sin(t / 140 + i)) * 7 : 0;
-      const сдвиг = celebrating ? 0 : Math.sin(t / 900 + i * 2) * 4 * с.шаг;
+    ЛЮДИ.forEach((л, i) => {
+      if (!celebrating) обновитьБлуждание(л, dt || 16);
+      else { л.x = л.домX; л.facing = 'вниз'; л.состояние = 'работа'; }
 
-      ctx.fillStyle = '#8a6a4a'; ctx.fillRect(с.x - 16, с.y, 32, 5);
-      ctx.fillStyle = '#2b2b2b'; ctx.fillRect(с.x + 7, с.y - 12, 10, 10);
-      ctx.fillStyle = celebrating ? '#ffd23f' : (Math.sin(t / 150 + i * 3) > 0 ? '#5fd0ff' : '#1f6feb');
-      ctx.fillRect(с.x + 8, с.y - 10, 8, 6);
+      const идёт = л.состояние === 'идёт-туда' || л.состояние === 'идёт-домой';
+      const прыжок = celebrating ? Math.abs(Math.sin(t / 140 + i)) * 6 : 0;
+      const cy = л.y - 11 - прыжок; // чуть приподнят — колени скроются за монитором
 
-      const cx = с.x + сдвиг, cy = с.y - прыжок;
-      ctx.fillStyle = с.цвет; ctx.fillRect(cx - 6, cy - 14, 12, 13);
-      ctx.fillStyle = '#f2c9a0'; ctx.fillRect(cx - 5, cy - 22, 10, 8);
-      ctx.fillStyle = с.цвет;
-      if (celebrating) {
-        ctx.fillRect(cx - 9, cy - 24, 3, 10);
-        ctx.fillRect(cx + 6, cy - 24, 3, 10);
-        if (Math.random() < 0.15) искры.push({ x: cx + Math.random() * 16 - 8, y: cy - 26, t: 0 });
+      let ряд = (л.facing === 'влево' || л.facing === 'вправо') ? РЯД.бок : РЯД[л.facing];
+      let кадр;
+      if (celebrating) кадр = [3, 4][мод(Math.floor(t / 200 + i), 2)];
+      else if (идёт) кадр = [0, 1][мод(Math.floor(t / 160), 2)];
+      else кадр = [3, 4][мод(Math.floor(t / 500 + i), 2)]; // "работа" — руки в жесте набора
+
+      // сперва человек, монитор поверх — так стол скрывает ему ноги, а не наоборот
+      const sx = кадр * К, sy = ряд * В;
+      ctx.save();
+      if (л.facing === 'вправо') {
+        ctx.translate(л.x, 0); ctx.scale(-1, 1);
+        if (л.img.complete) ctx.drawImage(л.img, sx, sy, К, В, -К / 2, cy - В + 6, К, В);
       } else {
-        const ту = Math.sin(фаза * 2) * 2;
-        ctx.fillRect(cx - 8, cy - 9 + ту, 3, 5);
-        ctx.fillRect(cx + 5, cy - 9 - ту, 3, 5);
+        if (л.img.complete) ctx.drawImage(л.img, sx, sy, К, В, л.x - К / 2, cy - В + 6, К, В);
+      }
+      ctx.restore();
+
+      // ПК на своём месте (не двигается вместе с человеком, когда тот отходит)
+      const экран = ПК[мод(Math.floor(t / 220 + i), 3)];
+      if (экран && экран.complete) ctx.drawImage(экран, 0, 0, К, В, л.домX - К / 2, л.y - В + 6, К, В);
+
+      if (celebrating && Math.random() < 0.12) {
+        искры.push({ x: л.x + Math.random() * 16 - 8, y: cy - В - 4, t: 0 });
       }
     });
 
@@ -760,10 +807,12 @@ function активировать(ид, тянуть = true) {
     });
   }
 
+  let предыдущийКадр = performance.now();
   function тик(сейчас) {
     const реальное = сейчас - старт;
     const celebrating = празднуемС !== 0;
-    рисовать(реальное, celebrating);
+    рисовать(реальное, celebrating, сейчас - предыдущийКадр);
+    предыдущийКадр = сейчас;
 
     const символов = Math.round(прогресс * КОД.length);
     текстЭл.innerHTML = подсветить(КОД.slice(0, символов)) + (прогресс < 1 ? '<span class="код-курсор"></span>' : '');
