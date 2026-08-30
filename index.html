@@ -38,6 +38,7 @@
     width:26px;height:26px;border-radius:50%;background:#ff3b30;color:#fff;
     display:flex;align-items:center;justify-content:center;
     font:800 14px var(--mono);box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none}
+  .секция{position:relative}
   .интро-марка{writing-mode:vertical-rl;transform:rotate(180deg);
     font-family:var(--display);font-size:clamp(24px,2.6vw,42px);
     font-variation-settings:'wdth' 140,'wght' 900;letter-spacing:.1em;color:var(--fg)}
@@ -79,7 +80,8 @@
 <div class="win" id="макет">
 
   <!-- 1 ─ верхняя полоса · девиз -->
-  <div class="chrome grid">
+  <div class="chrome grid" style="position:relative">
+    <span class="блок-метка">1</span>
     <div class="c42 девиз">
       <span class="марка">DAPI TEAM</span>
       <span class="шаг">придумать</span><span class="стрелка">→</span>
@@ -95,7 +97,8 @@
   <div class="zone-body">
 
     <!-- навигация -->
-    <nav class="c5" style="display:grid;grid-template-rows:25px 22px 1fr;min-height:0">
+    <nav class="c5" style="position:relative;display:grid;grid-template-rows:25px 22px 1fr;min-height:0">
+      <span class="блок-метка">2</span>
       <div class="b шапка-панели"><span>Explorer</span><span class="dim">...</span></div>
       <div class="b корень"><span class="уголок">⌄</span><span>DAPI</span></div>
       <div class="px дерево" id="дерево" style="padding-top:var(--s2);overflow:auto"></div>
@@ -113,7 +116,8 @@
       <div class="колонка" id="колонка"></div>
     </div>
 
-    <aside class="c12 правая">
+    <aside class="c12 правая" style="position:relative">
+      <span class="блок-метка">3</span>
       <div class="b px vc" style="height:25px"><span class="ui">xxxxx</span></div>
       <div class="лента-окно"><div class="лента" id="лента"></div></div>
       <div class="t px vc" style="height:20px"><span class="micro">xxxxxxxxxxxx</span></div>
@@ -396,6 +400,7 @@ const колонка = document.getElementById('колонка');
   сек.className = 'секция p' + (р.основной ? '' : ' окно');
   сек.id = 'sec-' + р.id;
   сек.innerHTML =
+    `<span class="блок-метка">${i + 4}</span>` +
     (р.основной ? '' : `<button class="назад">← к основному</button>`) +
     `<h2 class="display">${р.имя}</h2>` +
     `<p class="лид w14 mt">${р.лид}</p>` +
@@ -586,9 +591,8 @@ addEventListener('keydown', e => {
   const оверлей = document.createElement('div');
   оверлей.className = 'интро-оверлей grid';
   оверлей.innerHTML =
-    `<div class="c5 интро-1"><span class="блок-метка">1</span><span class="интро-марка">DAPI TEAM</span></div>` +
+    `<div class="c5 интро-1"><span class="интро-марка">DAPI TEAM</span></div>` +
     `<div class="c24 интро-2">
-       <span class="блок-метка">2</span>
        <canvas id="пиксель-канвас"></canvas>
        <div class="интро-подсказка" id="интроПодсказка">
          <svg viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="1.4">
@@ -599,7 +603,6 @@ addEventListener('keydown', e => {
        </div>
      </div>` +
     `<div class="c13 интро-3">
-       <span class="блок-метка">3</span>
        <div class="код-титлбар">
          <span class="код-точка r"></span><span class="код-точка y"></span><span class="код-точка g"></span>
          <span class="код-вкладка">index.html</span>
