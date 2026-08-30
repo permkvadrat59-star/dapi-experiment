@@ -32,7 +32,12 @@
   .интро-оверлей{position:absolute;inset:0;z-index:50;background:var(--bg);
     cursor:pointer;transition:transform .75s cubic-bezier(.65,0,.35,1)}
   .интро-оверлей.уходит{transform:translateY(-100%)}
-  .интро-1{display:flex;align-items:center;justify-content:center;background:var(--bg-deep)}
+  .интро-1{position:relative;display:flex;align-items:center;justify-content:center;background:var(--bg-deep)}
+  /* ── ВРЕМЕННО: номера блоков для обсуждения, убрать потом ── */
+  .блок-метка{position:absolute;top:8px;left:8px;z-index:30;
+    width:26px;height:26px;border-radius:50%;background:#ff3b30;color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font:800 14px var(--mono);box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none}
   .интро-марка{writing-mode:vertical-rl;transform:rotate(180deg);
     font-family:var(--display);font-size:clamp(24px,2.6vw,42px);
     font-variation-settings:'wdth' 140,'wght' 900;letter-spacing:.1em;color:var(--fg)}
@@ -51,7 +56,7 @@
     .интро-подсказка{position:fixed;left:0;top:0;bottom:auto;animation:none}
   }
   @media (prefers-reduced-motion:reduce){.интро-подсказка{animation:none}}
-  .интро-3{background:#1e1e1e;display:flex;flex-direction:column;min-height:0}
+  .интро-3{position:relative;background:#1e1e1e;display:flex;flex-direction:column;min-height:0}
   .код-титлбар{flex:none;height:28px;display:flex;align-items:center;gap:6px;
     padding:0 10px;background:#252526;border-bottom:1px solid #161616}
   .код-точка{width:9px;height:9px;border-radius:50%}
@@ -581,8 +586,9 @@ addEventListener('keydown', e => {
   const оверлей = document.createElement('div');
   оверлей.className = 'интро-оверлей grid';
   оверлей.innerHTML =
-    `<div class="c5 интро-1"><span class="интро-марка">DAPI TEAM</span></div>` +
+    `<div class="c5 интро-1"><span class="блок-метка">1</span><span class="интро-марка">DAPI TEAM</span></div>` +
     `<div class="c24 интро-2">
+       <span class="блок-метка">2</span>
        <canvas id="пиксель-канвас"></canvas>
        <div class="интро-подсказка" id="интроПодсказка">
          <svg viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="1.4">
@@ -593,6 +599,7 @@ addEventListener('keydown', e => {
        </div>
      </div>` +
     `<div class="c13 интро-3">
+       <span class="блок-метка">3</span>
        <div class="код-титлбар">
          <span class="код-точка r"></span><span class="код-точка y"></span><span class="код-точка g"></span>
          <span class="код-вкладка">index.html</span>
