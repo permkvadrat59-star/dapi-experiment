@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>DAPI — демо: агенты за столом + матовые карточки</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&display=swap">
+<link rel="stylesheet" href="сетка.css">
+<style>
+  body{background:var(--bg);margin:0}
+  .win{width:100vw;min-height:100vh;position:relative;display:grid;
+       grid-template-rows:33px 1fr;background:var(--bg)}
+  .chrome{background:var(--bg-deep);border-bottom:1px solid var(--line)}
+
+  /* ═══ ЗОНА ИНТРО (то же самое, что в index.html, для контекста) ═══ */
+  .интро-зона{position:relative;height:420px;overflow:hidden;border-bottom:1px solid var(--line)}
+  .интро-оверлей{position:absolute;inset:0;z-index:50;background:var(--bg);
+    cursor:default;transition:transform .8s cubic-bezier(.65,0,.35,1)}
+  .интро-оверлей.уходит{transform:translateY(100%)}     /* теперь падает вниз, не уезжает вверх */
+  .интро-1{display:flex;align-items:center;justify-content:center;background:var(--bg-deep)}
+  .интро-марка{writing-mode:vertical-rl;transform:rotate(180deg);
+    font-family:var(--display);font-size:clamp(22px,2.4vw,38px);
+    font-variation-settings:'wdth' 140,'wght' 900;letter-spacing:.1em;color:var(--fg)}
+  .интро-2{position:relative;background:#eef1f4;overflow:hidden}
+  #сцена-агенты{position:absolute;inset:0;width:100%;height:100%;
+    image-rendering:pixelated;image-rendering:crisp-edges}
+  .интро-подсказка{position:absolute;left:50%;bottom:10%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;
+    background:rgba(31,31,31,.82);color:#fff;font:12px var(--ui);letter-spacing:.02em;
+    pointer-events:none;z-index:5;transition:opacity .4s ease;
+    animation:интро-подсказка-боунс 1.6s ease-in-out infinite}
+  .интро-подсказка svg{width:14px;height:14px;flex:none}
+  .интро-подсказка.скрыта{opacity:0}
+  @keyframes интро-подсказка-боунс{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+  @media (hover:hover) and (pointer:fine){
+    .интро-подсказка{position:fixed;left:0;top:0;bottom:auto;animation:none}
+  }
+  .интро-готово{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;
+    font-family:var(--display);font-size:clamp(32px,4.4vw,60px);
+    font-variation-settings:'wdth' 140,'wght' 900;color:#fff;text-align:center;
+    text-shadow:0 2px 24px rgba(0,0,0,.4);background:rgba(20,20,20,.18);
+    opacity:0;transform:scale(.72);pointer-events:none;
+    transition:opacity .32s ease,transform .32s cubic-bezier(.22,1.5,.4,1)}
+  .интро-готово.показ{opacity:1;transform:scale(1)}
+  .интро-3{background:#1e1e1e;display:flex;flex-direction:column;min-height:0}
+  .код-титлбар{flex:none;height:28px;display:flex;align-items:center;gap:6px;
+    padding:0 10px;background:#252526;border-bottom:1px solid #161616}
+  .код-точка{width:9px;height:9px;border-radius:50%}
+  .код-точка.r{background:#ff5f56} .код-точка.y{background:#ffbd2e} .код-точка.g{background:#27c93f}
+  .код-вкладка{margin-left:8px;font:11px var(--ui);color:#9d9d9d}
+  .код-тело{display:flex;flex:1;min-height:0;overflow-y:auto;scrollbar-width:none}
+  .код-тело::-webkit-scrollbar{display:none}
+  #код-gutter{margin:0;padding:14px 10px;text-align:right;color:#5a5a5a;
+    font:15px/1.5 var(--mono);user-select:none}
+  .код-текст-обёртка{flex:1;padding:14px 14px;overflow-x:hidden}
+  #код-текст{margin:0;font:15px/1.5 var(--mono);white-space:pre;color:#d4d4d4}
+  .tok-kw{color:#569cd6} .tok-str{color:#ce9178}
+  .код-курсор{display:inline-block;width:7px;height:14px;background:#d4d4d4;
+    vertical-align:text-bottom;animation:код-мигание 1s steps(1) infinite}
+  @keyframes код-мигание{50%{opacity:0}}
+
+  /* ═══ РАЗДЕЛ «О НАС» · та же canvas-сцена переезжает сюда фоном ═══ */
+  .о-нас{position:relative;min-height:640px;overflow:hidden;background:#eef1f4}
+  .о-нас-скрим{position:absolute;inset:0;background:
+    linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.72) 40%,rgba(255,255,255,.86));
+    z-index:1}
+  .о-нас-угол{position:absolute;z-index:2;font:11px var(--mono);letter-spacing:.08em;
+    text-transform:uppercase;color:var(--fg-mute)}
+  .о-нас-угол b{color:var(--fg-dim);font-weight:600}
+  .о-нас-угол.tl{left:var(--u);top:var(--u)}
+  .о-нас-угол.tr{right:var(--u);top:var(--u);text-align:right}
+  .о-нас-угол.bl{left:var(--u);bottom:calc(var(--u) + 24px)}
+  .о-нас-угол.br{right:var(--u);bottom:calc(var(--u) + 24px);text-align:right}
+  .о-нас-заголовок{position:relative;z-index:2;padding:var(--s8) var(--u) var(--s5);text-align:center}
+  .о-нас-заголовок .эйбрау{font:12px var(--mono);letter-spacing:.16em;text-transform:uppercase;
+    color:var(--fg-mute)}
+  .о-нас-заголовок h2{font-family:var(--display);font-size:clamp(34px,5vw,64px);
+    font-variation-settings:'wdth' 140,'wght' 900;letter-spacing:-.02em;margin:var(--s2) 0 0;color:var(--fg)}
+  .карточки{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,1fr);
+    gap:var(--s4);max-width:1200px;margin:0 auto;padding:0 var(--u) var(--s8)}
+  @media (max-width:900px){.карточки{grid-template-columns:1fr}}
+  .карточка{position:relative;background:rgba(255,255,255,.56);
+    -webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);
+    border:1px solid rgba(255,255,255,.85);border-radius:20px;
+    padding:var(--s6);box-shadow:0 14px 40px rgba(20,24,30,.08)}
+  .карточка h3{font-family:var(--display);font-size:22px;
+    font-variation-settings:'wdth' 130,'wght' 800;margin:0 0 var(--s2);color:var(--fg)}
+  .карточка p{margin:0;color:var(--fg-dim);line-height:1.55}
+  .карточка-тех{position:absolute;top:-9px;left:var(--s3);font:10px var(--mono);
+    letter-spacing:.03em;background:var(--fg);color:#fff;padding:2px 7px;border-radius:5px;opacity:.85}
+  .линейка{position:relative;z-index:2;height:26px;border-top:1px solid rgba(0,0,0,.08);
+    display:flex;align-items:flex-end;padding:0 var(--u) 4px;gap:0}
+  .линейка i{flex:1;border-left:1px solid rgba(0,0,0,.14);height:6px}
+  .линейка i:nth-child(5n+1){height:12px}
+</style>
+</head>
+<body>
+<div class="win">
+
+  <div class="chrome grid">
+    <div class="c42" style="display:flex;align-items:center;justify-content:center;gap:10px;height:100%">
+      <span class="марка">DAPI TEAM</span>
+      <span class="шаг">придумать</span><span class="стрелка">→</span>
+      <span class="шаг">сделать</span><span class="стрелка">→</span>
+      <span class="шаг">продать</span>
+    </div>
+  </div>
+
+  <!-- ИНТРО: те же 3 блока, что в index.html — тут просто для контекста прокрутки -->
+  <div class="интро-зона">
+    <div class="интро-оверлей grid" id="интроОверлей">
+      <div class="c5 интро-1"><span class="интро-марка">DAPI TEAM</span></div>
+      <div class="c24 интро-2" id="интроПанель">
+        <canvas id="сцена-агенты"></canvas>
+        <div class="интро-подсказка" id="интроПодсказка">
+          <svg viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="1.4">
+            <rect x="1" y="1" width="14" height="22" rx="7"/>
+            <line x1="8" y1="6" x2="8" y2="10" stroke-linecap="round"/>
+          </svg>
+          <span>Листай</span>
+        </div>
+        <div class="интро-готово" id="интроГотово">Сайт готов</div>
+      </div>
+      <div class="c13 интро-3">
+        <div class="код-титлбар">
+          <span class="код-точка r"></span><span class="код-точка y"></span><span class="код-точка g"></span>
+          <span class="код-вкладка">index.html</span>
+        </div>
+        <div class="код-тело">
+          <pre id="код-gutter"></pre>
+          <div class="код-текст-обёртка"><pre id="код-текст"></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- О НАС: агенты остаются работать фоном, поверх — матовые карточки -->
+  <section class="о-нас" id="секцияОНас">
+    <div class="о-нас-скрим"></div>
+    <span class="о-нас-угол tl">01 <b>КТО МЫ</b></span>
+    <span class="о-нас-угол tr">02 <b>ЧЕТВЕРО В ПЕРМИ</b></span>
+    <span class="о-нас-угол bl">03 <b>M: HELLO@DAPI.TEAM</b></span>
+    <span class="о-нас-угол br">04 <b>ОТКРЫТЫ ДЛЯ ЗАДАЧ</b></span>
+
+    <div class="о-нас-заголовок">
+      <div class="эйбрау">о нас</div>
+      <h2>Делаем сайты руками,<br>не отходя от стола</h2>
+    </div>
+
+    <div class="карточки">
+      <div class="карточка">
+        <span class="карточка-тех">backdrop-filter: blur(20px)</span>
+        <h3>кто мы</h3>
+        <p>Дима, Арсений, Платон, Илья. Собрались вокруг работы, которую умеем делать руками — от макета до сервера.</p>
+      </div>
+      <div class="карточка">
+        <h3>как работаем</h3>
+        <p>Смотрим сайт, собираем список поломок, называем срок и цену одной страницей. Дальше показываем на живом стенде каждые пару дней.</p>
+      </div>
+      <div class="карточка">
+        <h3>почему код</h3>
+        <p>Верстаем в коде, а не в конструкторе. Поэтому правка занимает часы, а не спринт, и сайт не упирается в чужие лимиты.</p>
+      </div>
+    </div>
+
+    <div class="линейка" id="линейка"></div>
+  </section>
+
+</div>
+
+<script>
+/* ═══ ДЕМО: агенты за столом (реальные спрайты Pixel Agents, CC0) ═══
+   Сцена рисуется в один canvas, который на "открытии сайта" живёт в интро,
+   а после реплэйсится (тот же DOM-узел, не копия) фоном в «о нас» —
+   один и тот же рендер-луп, просто у канваса меняются родитель и размер. */
+(function () {
+  // линейка тиков в подвале "о нас" — просто мелкая деталь референса
+  const линейка = document.getElementById('линейка');
+  for (let i = 0; i < 60; i++) линейка.appendChild(document.createElement('i'));
+
+  let МАСШТАБ = 3; // 1 виртуальный пиксель = N реальных — крупнее, когда сцена уезжает широким фоном
+  const канвас = document.getElementById('сцена-агенты');
+  const ctx = канвас.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  function размер() {
+    const r = канвас.getBoundingClientRect();
+    канвас.width = Math.max(60, Math.round(r.width / МАСШТАБ));
+    канвас.height = Math.max(40, Math.round(r.height / МАСШТАБ));
+  }
+  размер();
+  addEventListener('resize', размер);
+
+  /* ── спрайты: 4 персонажа, сетка 7 колонок × 3 ряда по 16×32 (CC0, Pixel Agents) ── */
+  const ФАЙЛЫ = ['assets/pixel/char_0.png', 'assets/pixel/char_1.png', 'assets/pixel/char_2.png', 'assets/pixel/char_3.png'];
+  const СТОЛ_ФАЙЛ = 'assets/pixel/desk.png';
+  const РЯД = { вниз: 0, вверх: 1, бок: 2 };
+  const КАДР_W = 16, КАДР_H = 32;
+
+  let загружено = 0;
+  const ВСЕГО = ФАЙЛЫ.length + 1;
+  const imgs = ФАЙЛЫ.map(src => { const i = new Image(); i.onload = готово; i.src = src; return i; });
+  const столИмг = new Image(); столИмг.onload = готово; столИмг.src = СТОЛ_ФАЙЛ;
+  function готово() { if (++загружено === ВСЕГО) requestAnimationFrame(тик); }
+
+  const ЛЮДИ = [
+    { img: imgs[0], домFx: 0.42, домFy: 0.30, facing: 'вниз',  work: [3, 4] },
+    { img: imgs[1], домFx: 0.58, домFy: 0.30, facing: 'вниз',  work: [3, 4] },
+    { img: imgs[2], домFx: 0.42, домFy: 0.72, facing: 'вверх', work: [0, 1] },
+    { img: imgs[3], домFx: 0.58, домFy: 0.72, facing: 'вверх', work: [0, 1] },
+  ].map(л => ({
+    ...л, x: л.домFx, y: л.домFy, состояние: 'работа', кадр: 0,
+    следующееБлуждание: 1200 + Math.random() * 2600,
+    цель: null, зеркало: false
+  }));
+
+  function рисоватьПерсонажа(л, t) {
+    const cw = канвас.width, ch = канвас.height;
+    const px = л.x * cw, py = л.y * ch;
+    let ряд = РЯД[л.facing === 'влево' || л.facing === 'вправо' ? 'бок' : л.facing];
+    let колонки = л.состояние === 'работа' ? л.work : [0, 1];
+    л.кадр = Math.floor(t / (л.состояние === 'работа' ? 480 : 180)) % colonLen(колонки);
+    const col = колонки[л.кадр];
+    const sx = col * КАДР_W, sy = ряд * КАДР_H;
+
+    ctx.save();
+    if (л.facing === 'вправо') {
+      ctx.translate(px, 0); ctx.scale(-1, 1);
+      ctx.drawImage(л.img, sx, sy, КАДР_W, КАДР_H, -КАДР_W / 2, py - КАДР_H + 6, КАДР_W, КАДР_H);
+    } else {
+      ctx.drawImage(л.img, sx, sy, КАДР_W, КАДР_H, px - КАДР_W / 2, py - КАДР_H + 6, КАДР_W, КАДР_H);
+    }
+    ctx.restore();
+  }
+  function colonLen(arr) { return arr.length; }
+
+  function обновитьБлуждание(л, dt) {
+    if (л.состояние === 'работа') {
+      л.следующееБлуждание -= dt;
+      if (л.следующееБлуждание <= 0) {
+        const dx = (Math.random() * 0.16 + 0.08) * (Math.random() < 0.5 ? -1 : 1);
+        л.цель = { x: Math.min(0.92, Math.max(0.08, л.домFx + dx)), y: л.домFy + (Math.random() * 0.05 - 0.025) };
+        л.facing = dx < 0 ? 'влево' : 'вправо';
+        л.состояние = 'идёт-туда';
+      }
+    } else if (л.состояние === 'идёт-туда') {
+      const dx = л.цель.x - л.x, dy = л.цель.y - л.y;
+      const d = Math.hypot(dx, dy);
+      if (d < 0.01) { л.состояние = 'пауза'; л.пауза = 500 + Math.random() * 900; }
+      else { л.x += dx * Math.min(1, dt / 260); л.y += dy * Math.min(1, dt / 260); }
+    } else if (л.состояние === 'пауза') {
+      л.пауза -= dt;
+      if (л.пауза <= 0) {
+        л.цель = { x: л.домFx, y: л.домFy };
+        л.facing = л.x > л.домFx ? 'влево' : 'вправо';
+        л.состояние = 'идёт-домой';
+      }
+    } else if (л.состояние === 'идёт-домой') {
+      const dx = л.цель.x - л.x, dy = л.цель.y - л.y;
+      const d = Math.hypot(dx, dy);
+      if (d < 0.01) {
+        л.x = л.домFx; л.y = л.домFy;
+        л.facing = л.домFy < 0.5 ? 'вниз' : 'вверх';
+        л.состояние = 'работа';
+        л.следующееБлуждание = 2500 + Math.random() * 4000;
+      } else { л.x += dx * Math.min(1, dt / 260); л.y += dy * Math.min(1, dt / 260); }
+    }
+  }
+
+  let предыдущийT = performance.now();
+  function тик(сейчас) {
+    const dt = сейчас - предыдущийT; предыдущийT = сейчас;
+    const cw = канвас.width, ch = канвас.height;
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.fillStyle = '#eef1f4'; ctx.fillRect(0, 0, cw, ch);
+    ctx.strokeStyle = 'rgba(0,0,0,.04)';
+    for (let x = 0; x < cw; x += 20) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, ch); ctx.stroke(); }
+
+    // стол по центру
+    const tw = Math.min(cw * 0.42, 220), th = tw * (столИмг.height / столИмг.width);
+    ctx.drawImage(столИмг, cw / 2 - tw / 2, ch * 0.5 - th / 2, tw, th);
+
+    ЛЮДИ.forEach(л => { обновитьБлуждание(л, dt); рисоватьПерсонажа(л, сейчас); });
+
+    requestAnimationFrame(тик);
+  }
+
+  /* ── переезд сцены из интро в фон «о нас» — тот же canvas-узел ── */
+  window.__переселитьСценуАгентов = function () {
+    const секция = document.getElementById('секцияОНас');
+    секция.insertBefore(канвас, секция.firstChild);
+    канвас.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;' +
+      'image-rendering:pixelated;image-rendering:crisp-edges;z-index:0';
+    МАСШТАБ = 5;   // фон широкий — крупнее, чтобы люди не терялись, позиция (в долях) не съезжает
+    размер();
+  };
+})();
+
+/* ═══ ИНТРО: код-панель + прогресс по скроллу (то же, что в index.html) ═══ */
+(function () {
+  const ДИСТАНЦИЯ = 1800, ПРАЗДНИК = 1400;
+  const оверлей = document.getElementById('интроОверлей');
+  const подсказка = document.getElementById('интроПодсказка');
+  const готовоТекст = document.getElementById('интроГотово');
+
+  const КОД = `const РАЗДЕЛЫ = JSON.parse(document.getElementById('разделы').textContent);
+const дерево = document.getElementById('дерево');
+const вкладки = document.getElementById('вкладки');
+
+РАЗДЕЛЫ.forEach((р, i) => {
+  const узел = document.createElement('div');
+  узел.className = 'узел' + (р.основной ? '' : ' окно-узел');
+  узел.dataset.ид = р.id;
+  дерево.appendChild(узел);
+
+  if (р.таб) {
+    const вк = document.createElement('div');
+    вк.className = 'вкладка vc';
+    вк.dataset.ид = р.id;
+    вкладки.appendChild(вк);
+  }
+});
+
+function активировать(ид, тянуть = true) {
+  if (ид === текущий) return;
+  текущий = ид;
+  дерево.querySelectorAll('.узел').forEach(у =>
+    у.classList.toggle('раскрыт', у.dataset.ид === ид));
+}`;
+  document.getElementById('код-gutter').textContent =
+    КОД.split('\n').map((_, i) => i + 1).join('\n');
+  const текстЭл = document.getElementById('код-текст');
+  const кодТело = document.querySelector('.код-тело');
+
+  function подсветить(s) {
+    const М1 = String.fromCharCode(1), М2 = String.fromCharCode(2);
+    return s
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/(['"][^'"]*['"])/g, М1 + '$1' + М2)
+      .split(new RegExp(М1 + '|' + М2))
+      .map((часть, i) => i % 2 === 1
+        ? `<span class="tok-str">${часть}</span>`
+        : часть.replace(/\b(function|const|let|if|return|new)\b/g, '<span class="tok-kw">$1</span>'))
+      .join('');
+  }
+
+  let прогресс = 0, празднуемС = 0, завершаем = false;
+
+  function уйти() {
+    if (завершаем) return;
+    завершаем = true;
+    if (window.__переселитьСценуАгентов) window.__переселитьСценуАгентов();
+    оверлей.classList.add('уходит');
+    setTimeout(() => { оверлей.style.display = 'none'; }, 850);
+  }
+
+  function ввод(d) {
+    if (завершаем || празднуемС) return;
+    прогресс = Math.min(1, Math.max(0, прогресс + d / ДИСТАНЦИЯ));
+    if (прогресс > 0.02) подсказка.classList.add('скрыта');
+    if (прогресс >= 1) { празднуемС = performance.now(); готовоТекст.classList.add('показ'); }
+  }
+
+  оверлей.addEventListener('wheel', e => { e.preventDefault(); ввод(e.deltaY); }, { passive: false });
+  let последнийY = null;
+  оверлей.addEventListener('touchstart', e => { последнийY = e.touches[0].clientY; }, { passive: true });
+  оверлей.addEventListener('touchmove', e => {
+    if (последнийY === null) return;
+    const y = e.touches[0].clientY;
+    ввод(последнийY - y);
+    последнийY = y;
+    e.preventDefault();
+  }, { passive: false });
+  addEventListener('keydown', e => {
+    if (завершаем) return;
+    if (e.key === 'Escape') return уйти();
+    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); ввод(220); }
+  });
+  if (matchMedia('(hover:hover) and (pointer:fine)').matches) {
+    оверлей.addEventListener('mousemove', e => {
+      подсказка.style.transform = `translate(${e.clientX + 18}px, ${e.clientY + 18}px)`;
+    });
+  }
+
+  function тикТекст(сейчас) {
+    const символов = Math.round(прогресс * КОД.length);
+    текстЭл.innerHTML = подсветить(КОД.slice(0, символов)) + (прогресс < 1 ? '<span class="код-курсор"></span>' : '');
+    кодТело.scrollTop = кодТело.scrollHeight;
+    if (празднуемС && сейчас - празднуемС > ПРАЗДНИК && !завершаем) { уйти(); return; }
+    if (!завершаем) requestAnimationFrame(тикТекст);
+  }
+  requestAnimationFrame(тикТекст);
+})();
+</script>
+</body>
+</html>
