@@ -28,52 +28,58 @@
   .field{background:var(--bg-lift)}
   .hi{background:var(--bg-hi)}
 
-  /* ═══ ИНТРО · три блока поверх дерева/центра/ленты на время загрузки ═══ */
-  .интро-оверлей{position:absolute;inset:0;z-index:50;background:var(--bg);
-    cursor:pointer;transition:transform .75s cubic-bezier(.65,0,.35,1)}
-  .интро-оверлей.уходит{transform:translateY(-100%)}
-  .интро-1{position:relative;display:flex;align-items:center;justify-content:center;background:var(--bg-deep)}
   /* ── ВРЕМЕННО: номера блоков для обсуждения, убрать потом ── */
   .блок-метка{position:absolute;top:8px;left:8px;z-index:30;
     width:26px;height:26px;border-radius:50%;background:#ff3b30;color:#fff;
     display:flex;align-items:center;justify-content:center;
     font:800 14px var(--mono);box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none}
   .секция{position:relative}
-  .интро-марка{writing-mode:vertical-rl;transform:rotate(180deg);
-    font-family:var(--display);font-size:clamp(24px,2.6vw,42px);
-    font-variation-settings:'wdth' 140,'wght' 900;letter-spacing:.1em;color:var(--fg)}
-  .интро-2{position:relative;background:var(--bg-soft);cursor:default}
-  #пиксель-канвас{position:absolute;inset:0;width:100%;height:100%;
-    image-rendering:pixelated;image-rendering:crisp-edges}
-  .интро-подсказка{position:absolute;left:50%;bottom:14%;transform:translateX(-50%);
-    display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;
-    background:rgba(31,31,31,.82);color:#fff;font:12px var(--ui);letter-spacing:.02em;
-    pointer-events:none;z-index:5;transition:opacity .4s ease;
-    animation:интро-подсказка-боунс 1.6s ease-in-out infinite}
-  .интро-подсказка svg{width:14px;height:14px;flex:none}
-  .интро-подсказка.скрыта{opacity:0}
-  @keyframes интро-подсказка-боунс{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
-  @media (hover:hover) and (pointer:fine){
-    .интро-подсказка{position:fixed;left:0;top:0;bottom:auto;animation:none}
-  }
-  @media (prefers-reduced-motion:reduce){.интро-подсказка{animation:none}}
-  .интро-3{position:relative;background:#1e1e1e;display:flex;flex-direction:column;min-height:0}
+
+  /* ═══ БЛОК 3 · CODE / VIBE / DESIGN / LIFE вместо старой ленты ═══ */
+  .блок3-табы{display:flex;height:100%}
+  .блок3-таб{flex:1;border:0;border-right:1px solid var(--line);background:none;cursor:pointer;
+    font:700 11px var(--mono);letter-spacing:.06em;color:var(--fg-mute);
+    transition:background .15s,color .15s}
+  .блок3-таб:last-child{border-right:0}
+  .блок3-таб:hover{color:var(--fg-dim);background:var(--bg-soft)}
+  .блок3-таб.активен{color:var(--fg);background:var(--bg-hi)}
+  .блок3-контент{position:relative;min-height:0}
+  .блок3-панель{position:absolute;inset:0;display:none;flex-direction:column;min-height:0}
+  .блок3-панель.активна{display:flex}
+  .блок3-заглушка{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    height:100%;gap:6px;font-family:var(--display);font-size:22px;
+    font-variation-settings:'wdth' 130,'wght' 800;color:var(--fg-mute);letter-spacing:.04em}
+  .блок3-заглушка span{font:11px var(--mono);letter-spacing:.12em;text-transform:uppercase;
+    color:var(--fg-mute);opacity:.6}
+
+  /* код-панель — переехала из старого интро в раздел CODE, теперь живёт постоянно */
   .код-титлбар{flex:none;height:28px;display:flex;align-items:center;gap:6px;
     padding:0 10px;background:#252526;border-bottom:1px solid #161616}
   .код-точка{width:9px;height:9px;border-radius:50%}
   .код-точка.r{background:#ff5f56} .код-точка.y{background:#ffbd2e} .код-точка.g{background:#27c93f}
   .код-вкладка{margin-left:8px;font:11px var(--ui);color:#9d9d9d}
-  .код-тело{display:flex;flex:1;min-height:0;overflow-y:auto;scrollbar-width:none}
+  .код-тело{display:flex;flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;background:#1e1e1e}
   .код-тело::-webkit-scrollbar{display:none}
   #код-gutter{margin:0;padding:14px 10px;text-align:right;color:#5a5a5a;
-    font:16px/1.5 var(--mono);user-select:none}
+    font:13px/1.5 var(--mono);user-select:none}
   .код-текст-обёртка{flex:1;padding:14px 14px;overflow-x:hidden}
-  #код-текст{margin:0;font:16px/1.5 var(--mono);white-space:pre;color:#d4d4d4}
-  .tok-kw{color:#569cd6} .tok-str{color:#ce9178}
-  .код-курсор{display:inline-block;width:7px;height:14px;background:#d4d4d4;
+  #код-текст{margin:0;font:13px/1.5 var(--mono);white-space:pre;color:#d4d4d4}
+  .tok-kw{color:#569cd6} .tok-str{color:#ce9178} .tok-com{color:#6a9955}
+  .код-курсор{display:inline-block;width:7px;height:13px;background:#d4d4d4;
     vertical-align:text-bottom;animation:код-мигание 1s steps(1) infinite}
   @keyframes код-мигание{50%{opacity:0}}
-  @media (prefers-reduced-motion:reduce){.интро-оверлей{display:none}}
+
+  /* ═══ ШАПКА · три зоны: марка слева (кнопка-рестарт) / девиз в центре / слоган справа ═══ */
+  .девиз{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:100%;padding:0 var(--s3)}
+  .марка-кнопка{justify-self:start;background:none;border:0;padding:0;cursor:pointer;
+    display:flex;align-items:center}
+  .марка-кнопка:hover .марка{color:var(--accent)}
+  .девиз-центр{justify-self:center;font-family:var(--display);font-size:11px;
+    font-variation-settings:'wdth' 125,'wght' 800;letter-spacing:.14em;color:var(--fg-dim);
+    white-space:nowrap}
+  .девиз-право{justify-self:end;font-family:var(--display);font-size:11px;
+    font-variation-settings:'wdth' 125,'wght' 800;letter-spacing:.04em;
+    color:#ff2d2d;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -83,10 +89,11 @@
   <div class="chrome grid" style="position:relative">
     <span class="блок-метка">1</span>
     <div class="c42 девиз">
-      <span class="марка">DAPI TEAM</span>
-      <span class="шаг">придумать</span><span class="стрелка">→</span>
-      <span class="шаг">сделать</span><span class="стрелка">→</span>
-      <span class="шаг">продать</span>
+      <button class="марка-кнопка" id="маркаРестарт" title="Перезапустить интро">
+        <span class="марка">DAPI TEAM</span>
+      </button>
+      <span class="девиз-центр">CODE. VIBE. DESIGN. LIFE.</span>
+      <span class="девиз-право">хуйню не кодим</span>
     </div>
   </div>
 
@@ -116,11 +123,29 @@
       <div class="колонка" id="колонка"></div>
     </div>
 
-    <aside class="c12 правая" style="position:relative">
+    <aside class="c12 правая" style="position:relative;grid-template-rows:25px 1fr">
       <span class="блок-метка">3</span>
-      <div class="b px vc" style="height:25px"><span class="ui">xxxxx</span></div>
-      <div class="лента-окно"><div class="лента" id="лента"></div></div>
-      <div class="t px vc" style="height:20px"><span class="micro">xxxxxxxxxxxx</span></div>
+      <div class="b блок3-табы">
+        <button class="блок3-таб активен" data-таб="code">CODE</button>
+        <button class="блок3-таб" data-таб="vibe">VIBE</button>
+        <button class="блок3-таб" data-таб="design">DESIGN</button>
+        <button class="блок3-таб" data-таб="life">LIFE</button>
+      </div>
+      <div class="блок3-контент">
+        <div class="блок3-панель код активна" data-панель="code">
+          <div class="код-титлбар">
+            <span class="код-точка r"></span><span class="код-точка y"></span><span class="код-точка g"></span>
+            <span class="код-вкладка">pentagon_hack.py</span>
+          </div>
+          <div class="код-тело">
+            <pre id="код-gutter"></pre>
+            <div class="код-текст-обёртка"><pre id="код-текст"></pre></div>
+          </div>
+        </div>
+        <div class="блок3-панель" data-панель="vibe"><div class="блок3-заглушка">VIBE<span>скоро</span></div></div>
+        <div class="блок3-панель" data-панель="design"><div class="блок3-заглушка">DESIGN<span>скоро</span></div></div>
+        <div class="блок3-панель" data-панель="life"><div class="блок3-заглушка">LIFE<span>скоро</span></div></div>
+      </div>
     </aside>
   </div>
 
@@ -501,339 +526,161 @@ function перейти(ид, якорь) {
 
 активировать(ОСНОВНЫЕ[0], false);
 
-/* ══ ПРАВЫЙ БЛОК · сам по себе, с левой навигацией не связан ══
-   лента едет бесконечно, колонка 3u — её собственный индикатор:
-   подсвечивается та метка, чей блок сейчас проходит через окно. */
-const ЛЕНТА = [
-  {метка:'работы',  вид:'работа', сколько:4},   // скриншоты сайтов
-  {метка:'письма',  вид:'письмо', сколько:3},   // благодарственные письма
-  {метка:'лайв',    вид:'фото',   сколько:4}    // фото с работы
-];
-function кусок(пометить) {
-  const ф = document.createDocumentFragment();
-  ЛЕНТА.forEach((гр, i) => {
-    const г = document.createElement('div');
-    г.className = 'группа';
-    if (пометить) г.dataset.гр = i;
-    for (let k = 0; k < гр.сколько; k++) {
-      const э = document.createElement('div');
-      э.className = 'кадр ' + гр.вид;
-      г.appendChild(э);
-    }
-    ф.appendChild(г);
-  });
-  return ф;
-}
-лента.appendChild(кусок(true));
-лента.appendChild(кусок(false));   // дубль для бесшовности
-
-/* индикатор правого блока */
-ЛЕНТА.forEach((гр, i) => {
-  const ст = document.createElement('div');
-  ст.className = 'строка'; ст.dataset.гр = i;
-  ст.innerHTML = `<span class="micro">${гр.метка}</span>`;
-  колонка.appendChild(ст);
-});
-/* Индикатор ленты.
-   Раньше опрашивал getBoundingClientRect каждый кадр — браузер пересчитывал
-   раскладку 60 раз в секунду, и от этого подтормаживало дерево слева.
-   Теперь позиции групп снимаются один раз, а дальше всё считается
-   арифметикой по времени анимации, 8 опросов в секунду. */
-const окно = document.querySelector('.лента-окно');
-const метки = [...колонка.querySelectorAll('.строка')];
-let центры = [], периодНабора = 0, активнаяГр = -1;
-
-function обмерить() {
-  const группы = [...лента.querySelectorAll('[data-гр]')];
-  if (!группы.length) return;
-  периодНабора = лента.scrollHeight / 2;          // высота одного набора
-  центры = группы.map(г => г.offsetTop + г.offsetHeight / 2);
-}
-function следить() {
-  if (!периодНабора) return;
-  const анимация = лента.getAnimations()[0];
-  const t = анимация ? (анимация.currentTime || 0) : 0;
-  const длит = анимация ? (анимация.effect.getTiming().duration || 1) : 1;
-  const сдвиг = (t % длит) / длит * периодНабора;   // насколько лента уехала вверх
-  const цель = окно.clientHeight / 2 + сдвиг;
-  let ближайшая = 0, мин = Infinity;
-  центры.forEach((c, i) => {
-    const d = Math.abs(c - цель);
-    if (d < мин) { мин = d; ближайшая = i; }
-  });
-  if (ближайшая !== активнаяГр) {
-    активнаяГр = ближайшая;
-    метки.forEach((м, i) => м.classList.toggle('активна', i === ближайшая));
-  }
-}
-addEventListener('resize', обмерить);
-requestAnimationFrame(() => { обмерить(); следить(); setInterval(следить, 125); });
-
 addEventListener('keydown', e => {
   if ('gGпП'.includes(e.key)) document.documentElement.classList.toggle('guides');
 });
 </script>
 
 <script>
-/* ═══ ИНТРО · 3 блока на месте дерева / центра / ленты, идёт по скроллу ═══
-   Не видеофайлами и не таймером — колесо/свайп/стрелки двигают прогресс
-   0→1, от него зависят и печать кода, и сцена с людьми (жест один общий,
-   значит и кончаются вместе). Pixel Agents для этого не подходит: он
-   рисует только реальную активность живых агентов, сценарий "доделали →
-   обрадовались" ему не задать — люди и код собраны сами, canvas + текст. */
-(function () {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  try { if (sessionStorage.getItem('dapi-интро-показано')) return; } catch (e) {}
-
-  const ДИСТАНЦИЯ = 2200;   // сколько "прокрутки" (px-эквивалент) нужно для полного прогресса
-  const ПРАЗДНИК = 1300;    // сколько держим кадр радости перед уходом, мс
-
-  const оверлей = document.createElement('div');
-  оверлей.className = 'интро-оверлей grid';
-  оверлей.innerHTML =
-    `<div class="c5 интро-1"><span class="интро-марка">DAPI TEAM</span></div>` +
-    `<div class="c24 интро-2">
-       <canvas id="пиксель-канвас"></canvas>
-       <div class="интро-подсказка" id="интроПодсказка">
-         <svg viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="1.4">
-           <rect x="1" y="1" width="14" height="22" rx="7"/>
-           <line x1="8" y1="6" x2="8" y2="10" stroke-linecap="round"/>
-         </svg>
-         <span>Листай</span>
-       </div>
-     </div>` +
-    `<div class="c13 интро-3">
-       <div class="код-титлбар">
-         <span class="код-точка r"></span><span class="код-точка y"></span><span class="код-точка g"></span>
-         <span class="код-вкладка">index.html</span>
-       </div>
-       <div class="код-тело">
-         <pre id="код-gutter"></pre>
-         <div class="код-текст-обёртка"><pre id="код-текст"></pre></div>
-       </div>
-     </div>`;
-  document.querySelector('.zone-body').appendChild(оверлей);
-  const подсказка = document.getElementById('интроПодсказка');
-
-  /* ── код: реальный, крупный фрагмент из этого же файла — не одна функция,
-     а срез движка всего сайта (данные → рендер дерева/вкладок → активация) ── */
-  const КОД = `const РАЗДЕЛЫ = JSON.parse(document.getElementById('разделы').textContent);
-const дерево = document.getElementById('дерево');
-const вкладки = document.getElementById('вкладки');
-const контент = document.getElementById('контент');
-
-РАЗДЕЛЫ.forEach((р, i) => {
-  const узел = document.createElement('div');
-  узел.className = 'узел' + (р.основной ? '' : ' окно-узел');
-  узел.dataset.ид = р.id;
-  дерево.appendChild(узел);
-
-  if (р.таб) {
-    const вк = document.createElement('div');
-    вк.className = 'вкладка vc';
-    вк.dataset.ид = р.id;
-    вкладки.appendChild(вк);
-  }
-
-  const сек = document.createElement('section');
-  сек.className = 'секция p' + (р.основной ? '' : ' окно');
-  сек.id = 'sec-' + р.id;
-  контент.appendChild(сек);
+/* ═══ КНОПКА МАРКИ · клик по DAPI TEAM перезапускает интро ═══
+   Само интро сейчас временно снято (ждём финальную картинку-заставку) —
+   пока просто сбрасывает флаг «показано» и перезагружает страницу. */
+document.getElementById('маркаРестарт').addEventListener('click', () => {
+  try { sessionStorage.removeItem('dapi-интро-показано'); } catch (e) {}
+  location.reload();
 });
 
-function активировать(ид, тянуть = true) {
-  if (ид === текущий) return;
-  текущий = ид;
-  дерево.querySelectorAll('.узел').forEach(у =>
-    у.classList.toggle('раскрыт', у.dataset.ид === ид));
-  вкладки.querySelectorAll('.вкладка').forEach(в => {
-    const on = в.dataset.ид === ид;
-    в.classList.toggle('активна', on);
-    if (on && тянуть) в.scrollIntoView({block:'nearest', inline:'nearest', behavior:'smooth'});
+/* ═══ БЛОК 3 · вкладки CODE / VIBE / DESIGN / LIFE ═══ */
+document.querySelectorAll('.блок3-таб').forEach(таб => {
+  таб.addEventListener('click', () => {
+    document.querySelectorAll('.блок3-таб').forEach(т => т.classList.toggle('активен', т === таб));
+    document.querySelectorAll('.блок3-панель').forEach(п =>
+      п.classList.toggle('активна', п.dataset.панель === таб.dataset.таб));
   });
-}`;
-  document.getElementById('код-gutter').textContent =
-    КОД.split('\n').map((_, i) => i + 1).join('\n');
+});
+
+/* ═══ CODE · печать шуточного "взлома Пентагона" по скроллу всей страницы.
+   Монотонно: прогресс — это МАКСИМУМ scrollTop, когда-либо достигнутый,
+   а не текущий — поэтому скролл назад ничего не стирает, только вперёд
+   дописывает дальше. Код заведомо длиннее, чем нужно на весь скролл сайта,
+   с запасом (три захода — Пентагон / НАСА / Зона 51) — чтобы не кончался
+   на середине страницы. ═══ */
+(function () {
+  const контент = document.getElementById('контент');
+  const gutterЭл = document.getElementById('код-gutter');
   const текстЭл = document.getElementById('код-текст');
-  const кодТело = document.querySelector('.код-тело');
+  const кодТело = document.querySelector('.блок3-панель.код .код-тело');
+
+  function заход(номер, цель, файл) {
+    return `# ═══ ПОПЫТКА №${номер}: ВЗЛОМ «${цель}» ═══
+# DAPI TEAM — хуйню не кодим (но иногда прикалываемся)
+# не пытайтесь повторить — там наверняка уже читают этот файл
+
+import os, sys, time, random
+
+TARGET = "${файл}"
+CLASSIFIED_PORTS = [22, 80, 443, 1337, 31337, 42069]
+PROXY_CHAIN = ["antarctica", "n_korea_wifi", "starbucks_free_wifi", "соседский_роутер"]
+
+def print_banner():
+    print("╔══════════════════════════════════════════╗")
+    print("║   ХУЙНЮ НЕ КОДИМ — PENETRATION TEST v2.6  ║")
+    print("║   (шутка. мы просто верстаем сайты)       ║")
+    print("╚══════════════════════════════════════════╝")
+
+def ping_mainframe():
+    print(f"[*] resolving {TARGET} ...")
+    print(f"[+] {TARGET} resolved to 8.8.8.8 (легитимно на 100%)")
+    for port in CLASSIFIED_PORTS:
+        state = random.choice(["OPEN", "OPEN", "OPEN|FILTERED"])
+        print(f"[+] port {port}/tcp {state} — nice security guys, really")
+    print("[*] fingerprinting OS... Windows XP SP1 detected (2026 год, серьёзно?)")
+
+def bypass_firewall():
+    print("[*] launching ping of death (2003 edition, но работает)")
+    print("[*] injecting SQL: ' OR 1=1; DROP TABLE democracy; --")
+    print("[!] WAF BLOCKED REQUEST")
+    print("[*] retry капсом: ' OR 1=1--")
+    print("[+] ACCESS GRANTED (у них был пароль password123)")
+    print("[*] escalating privileges: sudo su root --i-am-totally-admin")
+    print("[+] you are now ROOT. поздравляем, это статья")
+
+def download_top_secret_files():
+    print("[*] locating FINAL_v3_USE_THIS_ONE_REALLY_FINAL.txt")
+    total = 137
+    for i in range(0, total + 1, 11):
+        pct = min(100, int(i / total * 100))
+        bar = "█" * (pct // 5) + "░" * (20 - pct // 5)
+        print(f"\r[{bar}] {pct}%  качаем на 56.6 kbit/s (dial-up gang)")
+    print("[+] скачано. содержимое: [ЗАСЕКРЕЧЕНО ЮРОТДЕЛОМ DAPI]")
+    print("[i] на самом деле там просто рецепт борща от бабушки Ильи")
+
+def deploy_rgb_hacking_module():
+    print("[*] устанавливаем больше RGB (скорость взлома +40%, доказано наукой)")
+    print("[*] переключаем подсветку клавиатуры на matrix-green")
+    print("[*] печатаем очень быстро двумя руками по клавиатуре")
+    print("[+] скорость взлома: MAXIMUM OVERDRIVE")
+
+def cover_tracks():
+    print("[*] удаляем логи: rm -rf /var/log/* (классика)")
+    for hop in PROXY_CHAIN:
+        print(f"[*] маршрутизируем трафик через {hop} ...")
+    print("[*] вину на Северную Корею, как велит традиция")
+    print("[+] следы заметены. шанс спалиться: 146%")
+
+def main():
+    print_banner()
+    ping_mainframe()
+    bypass_firewall()
+    download_top_secret_files()
+    deploy_rgb_hacking_module()
+    cover_tracks()
+    print()
+    print("[✓] МИССИЯ ВЫПОЛНЕНА. «${цель}» взломан (не совсем)")
+    print("[✓] на самом деле мы просто верстаем сайты в Перми")
+    print("[✓] DAPI TEAM — хуйню не кодим")
+
+if __name__ == "__main__":
+    main()
+
+`;
+  }
+
+  const КОД_ВЗЛОМ =
+    заход(1, 'ПЕНТАГОН', 'pentagon.mil') +
+    '\n\n' + заход(2, 'НАСА', 'nasa.gov') +
+    '\n\n' + заход(3, 'ЗОНА-51', 'area51.gov');
 
   function подсветить(s) {
-    const М1 = String.fromCharCode(1), М2 = String.fromCharCode(2);
-    return s
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/(['"][^'"]*['"])/g, М1 + '$1' + М2)
-      .split(new RegExp(М1 + '|' + М2))
-      .map((часть, i) => i % 2 === 1
-        ? `<span class="tok-str">${часть}</span>`
-        : часть.replace(/\b(function|const|let|if|return|new)\b/g, '<span class="tok-kw">$1</span>'))
-      .join('');
+    s = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const тайники = [];
+    function спрятать(html) { тайники.push(html); return '\u0000' + (тайники.length - 1) + '\u0000'; }
+    s = s.replace(/#[^\n]*/g, m => спрятать(`<span class="tok-com">${m}</span>`));
+    s = s.replace(/(['"])((?:(?!\1)[^\\]|\\.)*)\1/g, m => спрятать(`<span class="tok-str">${m}</span>`));
+    s = s.replace(/\b(def|import|from|if|__name__|__main__|return|for|in|print|True|False|None|as|while)\b/g,
+      '<span class="tok-kw">$1</span>');
+    s = s.replace(/\u0000(\d+)\u0000/g, (_, i) => тайники[i]);
+    return s;
   }
 
-  /* ── пиксельные люди: 4 персонажа за 4 РАЗНЫМИ рабочими местами (не общий стол),
-     реальные спрайты Pixel Agents (CC0, 7 колонок × 3 ряда по 16×32) + реальный ПК ── */
-  const канвас = document.getElementById('пиксель-канвас');
-  const ctx = канвас.getContext('2d');
-  const ШИР = 200, ВЫС = 96;
-  канвас.width = ШИР; канвас.height = ВЫС;
-  ctx.imageSmoothingEnabled = false;
+  const СКОРОСТЬ = 0.85; // символов кода на пиксель прокрутки
+  let максСкролл = 0;
 
-  const РЯД = { вниз: 0, вверх: 1, бок: 2 };
-  const К = 16, В = 32; // размер кадра
+  контент.addEventListener('scroll', () => {
+    максСкролл = Math.max(максСкролл, контент.scrollTop);
+  }, { passive: true });
 
-  function img(src) { const i = new Image(); i.src = src; return i; }
-  const ПК = [img('assets/pixel/PC_FRONT_ON_1.png'), img('assets/pixel/PC_FRONT_ON_2.png'), img('assets/pixel/PC_FRONT_ON_3.png')];
-
-  const ЛЮДИ = ['assets/pixel/char_0.png', 'assets/pixel/char_1.png', 'assets/pixel/char_2.png', 'assets/pixel/char_3.png']
-    .map((src, i) => ({
-      img: img(src), домX: 26 + i * 46, y: 74, facing: 'вниз',
-      x: 26 + i * 46, состояние: 'работа', пауза: 0,
-      цель: null, следующееБлуждание: 1500 + Math.random() * 3000
-    }));
-  const искры = [];
-
-  function обновитьБлуждание(л, dt) {
-    if (л.состояние === 'работа') {
-      л.следующееБлуждание -= dt;
-      if (л.следующееБлуждание <= 0) {
-        const dx = (Math.random() * 20 + 10) * (Math.random() < 0.5 ? -1 : 1);
-        л.цель = Math.max(10, Math.min(ШИР - 10, л.домX + dx));
-        л.facing = dx < 0 ? 'влево' : 'вправо';
-        л.состояние = 'идёт-туда';
-      }
-    } else if (л.состояние === 'идёт-туда') {
-      const dx = л.цель - л.x;
-      if (Math.abs(dx) < 1) { л.состояние = 'пауза'; л.пауза = 400 + Math.random() * 700; }
-      else л.x += Math.sign(dx) * Math.min(Math.abs(dx), dt * 0.045);
-    } else if (л.состояние === 'пауза') {
-      л.пауза -= dt;
-      if (л.пауза <= 0) { л.цель = л.домX; л.facing = л.x > л.домX ? 'влево' : 'вправо'; л.состояние = 'идёт-домой'; }
-    } else if (л.состояние === 'идёт-домой') {
-      const dx = л.цель - л.x;
-      if (Math.abs(dx) < 1) {
-        л.x = л.домX; л.facing = 'вниз'; л.состояние = 'работа';
-        л.следующееБлуждание = 2500 + Math.random() * 4500;
-      } else л.x += Math.sign(dx) * Math.min(Math.abs(dx), dt * 0.045);
+  let прошлоСимволов = -1;
+  function тикКод() {
+    const символов = Math.min(КОД_ВЗЛОМ.length, Math.floor(максСкролл * СКОРОСТЬ));
+    if (символов !== прошлоСимволов) {
+      прошлоСимволов = символов;
+      const показано = КОД_ВЗЛОМ.slice(0, символов);
+      // gutter растёт вместе с текстом — иначе он сразу показывает все ~230 строк,
+      // контейнер становится "высоким" с первого кадра, и автоскролл к низу
+      // утаскивает к ещё не написанным строкам
+      const строк = показано.split('\n').length;
+      gutterЭл.textContent = Array.from({ length: строк }, (_, i) => i + 1).join('\n');
+      текстЭл.innerHTML = подсветить(показано) +
+        (символов < КОД_ВЗЛОМ.length ? '<span class="код-курсор"></span>' : '');
+      кодТело.scrollTop = кодТело.scrollHeight;
     }
+    requestAnimationFrame(тикКод);
   }
-
-  function мод(n, m) { return ((n % m) + m) % m; }
-
-  function рисовать(t, celebrating, dt) {
-    t = Math.max(0, t);
-    ctx.clearRect(0, 0, ШИР, ВЫС);
-    ctx.fillStyle = '#eef0f2'; ctx.fillRect(0, 0, ШИР, ВЫС);
-    ctx.fillStyle = '#d8dbdf';
-    for (let x = 0; x < ШИР; x += 22) ctx.fillRect(x, 70, 1, ВЫС - 70);
-
-    ЛЮДИ.forEach((л, i) => {
-      if (!celebrating) обновитьБлуждание(л, dt || 16);
-      else { л.x = л.домX; л.facing = 'вниз'; л.состояние = 'работа'; }
-
-      const идёт = л.состояние === 'идёт-туда' || л.состояние === 'идёт-домой';
-      const прыжок = celebrating ? Math.abs(Math.sin(t / 140 + i)) * 6 : 0;
-      const cy = л.y - 11 - прыжок; // чуть приподнят — колени скроются за монитором
-
-      let ряд = (л.facing === 'влево' || л.facing === 'вправо') ? РЯД.бок : РЯД[л.facing];
-      let кадр;
-      if (celebrating) кадр = [3, 4][мод(Math.floor(t / 200 + i), 2)];
-      else if (идёт) кадр = [0, 1][мод(Math.floor(t / 160), 2)];
-      else кадр = [3, 4][мод(Math.floor(t / 500 + i), 2)]; // "работа" — руки в жесте набора
-
-      // сперва человек, монитор поверх — так стол скрывает ему ноги, а не наоборот
-      const sx = кадр * К, sy = ряд * В;
-      ctx.save();
-      if (л.facing === 'вправо') {
-        ctx.translate(л.x, 0); ctx.scale(-1, 1);
-        if (л.img.complete) ctx.drawImage(л.img, sx, sy, К, В, -К / 2, cy - В + 6, К, В);
-      } else {
-        if (л.img.complete) ctx.drawImage(л.img, sx, sy, К, В, л.x - К / 2, cy - В + 6, К, В);
-      }
-      ctx.restore();
-
-      // ПК на своём месте (не двигается вместе с человеком, когда тот отходит)
-      const экран = ПК[мод(Math.floor(t / 220 + i), 3)];
-      if (экран && экран.complete) ctx.drawImage(экран, 0, 0, К, В, л.домX - К / 2, л.y - В + 6, К, В);
-
-      if (celebrating && Math.random() < 0.12) {
-        искры.push({ x: л.x + Math.random() * 16 - 8, y: cy - В - 4, t: 0 });
-      }
-    });
-
-    for (let k = искры.length - 1; k >= 0; k--) {
-      const s = искры[k]; s.t++; s.y -= 0.4;
-      ctx.fillStyle = `rgba(255,196,64,${Math.max(0, 1 - s.t / 30)})`;
-      ctx.fillRect(s.x, s.y, 2, 2);
-      if (s.t > 30) искры.splice(k, 1);
-    }
-  }
-
-  /* ── прогресс 0→1 от жеста (колесо / свайп / стрелки), а не от часов;
-     часы остаются только для "живости" простоя (бобы/мигание монитора) ── */
-  const старт = performance.now();
-  let прогресс = 0;
-  let празднуемС = 0;   // 0 = ещё не радуемся; иначе — момент старта радости
-  let завершаем = false;
-
-  function уйти() {
-    if (завершаем) return;
-    завершаем = true;
-    оверлей.classList.add('уходит');
-    try { sessionStorage.setItem('dapi-интро-показано', '1'); } catch (e) {}
-    setTimeout(() => оверлей.remove(), 800);
-  }
-
-  function ввод(d) {
-    if (завершаем || празднуемС) return;
-    прогресс = Math.min(1, Math.max(0, прогресс + d / ДИСТАНЦИЯ));
-    if (прогресс > 0.02) подсказка.classList.add('скрыта');
-    if (прогресс >= 1) празднуемС = performance.now();
-  }
-
-  оверлей.addEventListener('wheel', e => { e.preventDefault(); ввод(e.deltaY); }, { passive: false });
-
-  let последнийY = null;
-  оверлей.addEventListener('touchstart', e => { последнийY = e.touches[0].clientY; }, { passive: true });
-  оверлей.addEventListener('touchmove', e => {
-    if (последнийY === null) return;
-    const y = e.touches[0].clientY;
-    ввод(последнийY - y);           // свайп вверх = как скролл вниз
-    последнийY = y;
-    e.preventDefault();
-  }, { passive: false });
-
-  оверлей.addEventListener('click', уйти);
-  addEventListener('keydown', e => {
-    if (завершаем) return;
-    if (e.key === 'Escape') return уйти();
-    if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
-      e.preventDefault();
-      ввод(220);
-    }
-  });
-
-  if (matchMedia('(hover:hover) and (pointer:fine)').matches) {
-    оверлей.addEventListener('mousemove', e => {
-      подсказка.style.transform = `translate(${e.clientX + 18}px, ${e.clientY + 18}px)`;
-    });
-  }
-
-  let предыдущийКадр = performance.now();
-  function тик(сейчас) {
-    const реальное = сейчас - старт;
-    const celebrating = празднуемС !== 0;
-    рисовать(реальное, celebrating, сейчас - предыдущийКадр);
-    предыдущийКадр = сейчас;
-
-    const символов = Math.round(прогресс * КОД.length);
-    текстЭл.innerHTML = подсветить(КОД.slice(0, символов)) + (прогресс < 1 ? '<span class="код-курсор"></span>' : '');
-    кодТело.scrollTop = кодТело.scrollHeight;
-
-    if (celebrating && сейчас - празднуемС > ПРАЗДНИК) { уйти(); return; }
-    if (!завершаем) requestAnimationFrame(тик);
-  }
-  requestAnimationFrame(тик);
+  requestAnimationFrame(тикКод);
 })();
 </script>
+
 
 
 
