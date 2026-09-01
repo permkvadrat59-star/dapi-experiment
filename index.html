@@ -74,16 +74,25 @@
     color:#e0201f;white-space:nowrap;transform:rotate(-2deg);
     text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
 
-  /* ═══ ЗАСТАВКА · картинка вместо старого скролл-интро ═══ */
-  .заставка{position:fixed;inset:0;z-index:100;background:#000;cursor:pointer;
+  /* ═══ ЗАСТАВКА · 4 равных вертикальных экрана (позже — видео) + лого по центру ═══ */
+  .заставка{position:fixed;inset:0;z-index:100;background:#0c0c0c;cursor:pointer;
     transition:opacity .6s ease}
-  .заставка img{width:100%;height:100%;object-fit:cover;display:block}
   .заставка.уходит{opacity:0;pointer-events:none}
+  .заставка-панели{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr)}
+  .заставка-панель{border-right:1px solid rgba(255,255,255,.08);background:#111315}
+  .заставка-панель:last-child{border-right:0}
+  .заставка-лого{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(58vw,760px);max-width:90vw;opacity:0;pointer-events:none;
+    animation:лого-проявка 5s ease forwards;animation-delay:2s}
+  @keyframes лого-проявка{from{opacity:0}to{opacity:1}}
   .заставка-подсказка{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);
     color:#fff;font:11px var(--mono);letter-spacing:.14em;text-transform:uppercase;
     opacity:.75;animation:застпульс 1.8s ease-in-out infinite;pointer-events:none}
   @keyframes застпульс{0%,100%{opacity:.35}50%{opacity:.85}}
-  @media (prefers-reduced-motion:reduce){.заставка-подсказка{animation:none}}
+  @media (prefers-reduced-motion:reduce){
+    .заставка-подсказка{animation:none}
+    .заставка-лого{animation:none;opacity:1}
+  }
 </style>
 </head>
 <body>
@@ -536,9 +545,12 @@ addEventListener('keydown', e => {
 </script>
 
 <script>
-/* ═══ ЗАСТАВКА · картинка вместо старого скролл-интро ═══
+/* ═══ ЗАСТАВКА · 4 равных вертикальных экрана (видео — позже) + лого по центру ═══
    Собирается через JS, только если ещё не показана в этой сессии —
-   без JS или после первого показа посетитель сразу видит сайт. */
+   без JS или после первого показа посетитель сразу видит сайт.
+   Лого: 0-2с ничего, 2-7с проявляется 0→100% (сама анимация — в CSS,
+   .заставка-лого), держим ещё секунду-полторы и только потом
+   автозакрытие — чтобы не обрезать анимацию на середине. */
 (function () {
   let показано = false;
   try { показано = !!sessionStorage.getItem('dapi-интро-показано'); } catch (e) {}
@@ -547,7 +559,13 @@ addEventListener('keydown', e => {
   const заст = document.createElement('div');
   заст.className = 'заставка';
   заст.innerHTML =
-    `<img src="assets/zastavka.jpg" alt="DAPI TEAM — CODE. VIBE. DESIGN. LIFE.">` +
+    `<div class="заставка-панели">
+       <div class="заставка-панель"></div>
+       <div class="заставка-панель"></div>
+       <div class="заставка-панель"></div>
+       <div class="заставка-панель"></div>
+     </div>` +
+    `<img class="заставка-лого" src="assets/dapi-logo.png" alt="DAPI TEAM — CODE. VIBE. DESIGN. LIFE.">` +
     `<div class="заставка-подсказка">нажми, чтобы продолжить</div>`;
   document.body.appendChild(заст);
 
@@ -561,7 +579,7 @@ addEventListener('keydown', e => {
   }
   заст.addEventListener('click', уйти);
   addEventListener('keydown', уйти, { once: true });
-  setTimeout(уйти, 4500); // не кликнули — сайт всё равно откроется сам
+  setTimeout(уйти, 8500); // 2с пауза + 5с проявка лого + держим — потом уходим сами
 })();
 
 /* ═══ КНОПКА МАРКИ · клик по DAPI TEAM перезапускает интро ═══ */
