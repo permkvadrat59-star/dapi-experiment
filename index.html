@@ -51,12 +51,17 @@
   .код-точка{width:9px;height:9px;border-radius:50%}
   .код-точка.r{background:#ff5f56} .код-точка.y{background:#ffbd2e} .код-точка.g{background:#27c93f}
   .код-вкладка{margin-left:8px;font:11px var(--ui);color:#9d9d9d}
-  .код-тело{display:flex;flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;background:#1e1e1e}
+  .код-тело{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;background:#1e1e1e}
   .код-тело::-webkit-scrollbar{display:none}
-  #код-gutter{margin:0;padding:14px 10px;text-align:right;color:#5a5a5a;
-    font:13px/1.5 var(--mono);user-select:none}
-  .код-текст-обёртка{flex:1;padding:14px 14px;overflow-x:hidden}
-  #код-текст{margin:0;font:13px/1.5 var(--mono);white-space:pre;color:#d4d4d4}
+  /* номер и текст строки — ОДИН элемент, физически не могут разойтись:
+     раньше это были два независимых столбца с раздельным textContent/
+     innerHTML, синхронизированные только логикой — на практике расходились */
+  #кодСтроки{padding:14px 0}
+  .код-строка{display:flex}
+  .код-номер{flex:none;width:36px;text-align:right;padding-right:10px;
+    color:#5a5a5a;user-select:none;font:13px/1.5 var(--mono)}
+  .код-содержимое{flex:1;padding-right:14px;font:13px/1.5 var(--mono);
+    white-space:pre;color:#d4d4d4}
   .tok-kw{color:#569cd6} .tok-str{color:#ce9178} .tok-com{color:#6a9955}
   .код-курсор{display:inline-block;width:7px;height:13px;background:#d4d4d4;
     vertical-align:text-bottom;animation:код-мигание 1s steps(1) infinite}
@@ -153,9 +158,8 @@
             <span class="код-точка r"></span><span class="код-точка y"></span><span class="код-точка g"></span>
             <span class="код-вкладка">pentagon_hack.py</span>
           </div>
-          <div class="код-тело">
-            <pre id="код-gutter"></pre>
-            <div class="код-текст-обёртка"><pre id="код-текст"></pre></div>
+          <div class="код-тело" id="кодТело">
+            <div id="кодСтроки"></div>
           </div>
         </div>
         <div class="блок3-панель" data-панель="vibe"><div class="блок3-заглушка">VIBE<span>скоро</span></div></div>
@@ -606,9 +610,8 @@ document.querySelectorAll('#колонка .строка').forEach(таб => {
    бесконечным и с большим запасом хватало на скролл туда-обратно. ═══ */
 (function () {
   const контент = document.getElementById('контент');
-  const gutterЭл = document.getElementById('код-gutter');
-  const текстЭл = document.getElementById('код-текст');
-  const кодТело = document.querySelector('.блок3-панель.код .код-тело');
+  const кодСтрокиЭл = document.getElementById('кодСтроки');
+  const кодТело = document.getElementById('кодТело');
 
   function заход(номер, цель, файл) {
     return `# ═══ ПОПЫТКА №${номер}: ВЗЛОМ «${цель}» ═══
@@ -736,13 +739,15 @@ if __name__ == "__main__":
     if (символов !== прошлоСимволов) {
       прошлоСимволов = символов;
       const показано = КОД_ВЗЛОМ.slice(0, символов);
-      // gutter растёт вместе с текстом — иначе он сразу показывает все ~230 строк,
-      // контейнер становится "высоким" с первого кадра, и автоскролл к низу
-      // утаскивает к ещё не написанным строкам
-      const строк = показано.split('\n').length;
-      gutterЭл.textContent = Array.from({ length: строк }, (_, i) => i + 1).join('\n');
-      текстЭл.innerHTML = подсветить(показано) +
-        (символов < КОД_ВЗЛОМ.length ? '<span class="код-курсор"></span>' : '');
+      const строки = показано.split('\n');
+      const незакончен = символов < КОД_ВЗЛОМ.length;
+      // номер и текст строки собраны в ОДИН div — физически не могут разъехаться,
+      // в отличие от прежних двух независимых столбцов с раздельным textContent
+      кодСтрокиЭл.innerHTML = строки.map((строка, i) => {
+        const курсор = (незакончен && i === строки.length - 1) ? '<span class="код-курсор"></span>' : '';
+        return `<div class="код-строка"><span class="код-номер">${i + 1}</span>` +
+          `<span class="код-содержимое">${подсветить(строка)}${курсор}</span></div>`;
+      }).join('');
       кодТело.scrollTop = кодТело.scrollHeight;
     }
     requestAnimationFrame(тикКод);
